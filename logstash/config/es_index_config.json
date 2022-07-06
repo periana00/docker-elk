@@ -1,0 +1,127 @@
+{
+    "index_patterns": ["article-*"],
+    "template" : {
+        "settings": {
+            "index.mapping.nested_objects.limit":30000,
+            "analysis": {
+                "tokenizer": {
+                    "nori": {
+                        "type": "nori_tokenizer",
+                        "decompound_mode": "MIXED",
+                        "user_dictionary": "user_dic.txt"
+                    }
+                },
+                "filter" : {
+                    "nori_filter" :{
+                        "type": "nori_part_of_speech",
+                        "stoptags": [
+                            "VV", "VA", "VX", "VCP", "VCN", "MM", "MAG", "MAJ", 
+                            "IC", "J", "E", 
+                            "XPN", "XSA", "XSN", "XSV", 
+                            "SP", "SSC", "SSO", "SC", "SE",
+                            "UNA", "NA", "VSV", "XR", "SN", "NNBC", "NNB"
+                        ]
+                    },
+                    "length_filter": {
+                        "type": "length",
+                        "min": 2
+                    },
+                    "synonym_filter": {
+                        "type": "synonym",
+                        "synonyms_path": "synonyms.txt",
+                        "lenient": true
+                    },
+                    "stop_filtering":{
+                        "type":"stop",
+                        "stopwords_path":"stopFilter.txt"
+                    }
+                },
+                "analyzer": {
+                    "korean": {
+                        "tokenizer": "nori",
+                        "filter": ["nori_filter", "length_filter", "synonym_filter", "stop_filtering"]
+                    }
+                }
+            }
+        },
+        "mappings": {
+            "properties": {
+                "portal": {
+                    "type": "keyword"
+                },
+                "url": {
+                    "type": "keyword"
+                },
+                "offer": {
+                    "type": "keyword"
+                },
+                "title" : {
+                    "type" : "text",
+                    "analyzer": "korean",
+                    "fielddata": true
+                },
+                "text" : {
+                    "type" : "text",
+                    "analyzer": "korean",
+                    "fielddata": true
+                },
+                "date": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss zzz||date_time_no_millis"
+                },
+                "sentiment_result": {
+                    "type": "keyword",
+                    "eager_global_ordinals": true
+                },
+                "comments_sentiment_bad": {
+                    "type": "integer"
+                },
+                "comments_sentiment_good": {
+                    "type": "integer"
+                },
+                "comments_size": {
+                    "type": "integer"
+                },
+                "comments": {
+                    "type": "nested",
+                    "properties" : {
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "uid": {
+                            "type": "keyword"
+                        },
+                        "text": {
+                            "type" : "text",
+                            "analyzer": "korean",
+                            "fielddata": true,
+                            "eager_global_ordinals": true
+                        },
+                        "sentiment_result": {
+                            "type": "keyword",
+                            "eager_global_ordinals": true
+                        },
+                        "sympathy": {
+                            "type": "keyword"
+                        },
+                        "antipathy": {
+                            "type": "keyword"
+                        },
+                        "time": {
+                            "type": "date",
+                            "format": "yyyy-MM-dd HH:mm:ss zzz||date_time_no_millis"
+                        },
+                        "weight": {
+                            "type": "byte"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "priority": 51,
+    "version": 1,
+    "_meta": {
+      "description": "my custom"
+    }
+}
